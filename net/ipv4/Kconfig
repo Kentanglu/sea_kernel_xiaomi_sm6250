@@ -688,6 +688,7 @@ config TCP_CONG_BBR
 
 config TCP_CONG_BBRPLUS
         tristate "BBRPLUS TCP"
+	default y
         ---help---
 
         BBRplus is an enhanced version of BBR (Bottleneck Bandwidth and RTT).
