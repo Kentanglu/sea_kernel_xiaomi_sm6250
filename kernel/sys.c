@@ -1225,6 +1225,7 @@ SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 				 current->comm, current->pid);
 		}
 	}
+#endif /* CONFIG_FAKE_UNAME_NONE */
 
 #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
 	susfs_spoof_uname(&tmp);
