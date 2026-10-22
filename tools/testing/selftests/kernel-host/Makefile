@@ -5,6 +5,7 @@ PYTHON ?= python3
 TESTS := test_ext4_flush.py test_bore.py test_sbalance.py \
 	test_devfreq_lifetime.py test_devfreq_limits.py test_adrenoboost.py \
 	test_process_madvise.py test_process_mrelease.py test_reclaim_advice.py \
+	test_uclamp.py test_uclamp_accounting.py \
 	../cpufreq/test_cpu_boost.py
 
 .PHONY: all run_tests
