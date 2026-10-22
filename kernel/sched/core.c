@@ -1334,15 +1334,6 @@ static int uclamp_validate(struct task_struct *p,
 	if (upper_bound > SCHED_CAPACITY_SCALE)
 		return -EINVAL;
 
-	/*
-	 * We have valid uclamp attributes; make sure uclamp is enabled.
-	 *
-	 * We need to do that here, because enabling static branches is a
-	 * blocking operation which obviously cannot be done while holding
-	 * scheduler locks.
-	 */
-	static_branch_enable(&sched_uclamp_used);
-
 	return 0;
 }
 
@@ -5223,12 +5214,11 @@ recheck:
 			return retval;
 	}
 
-	/* Update task specific "requested" clamps */
-	if (attr->sched_flags & SCHED_FLAG_UTIL_CLAMP) {
-		retval = uclamp_validate(p, attr);
-		if (retval)
-			return retval;
-	}
+#ifdef CONFIG_UCLAMP_TASK
+	/* Enabling static branches can sleep, so do it before taking rq locks. */
+	if (attr->sched_flags & SCHED_FLAG_UTIL_CLAMP)
+		static_branch_enable(&sched_uclamp_used);
+#endif
 
 	/*
 	 * Make sure no PI-waiters arrive (or leave) while we are
@@ -5239,6 +5229,15 @@ recheck:
 	 */
 	rq = task_rq_lock(p, &rf);
 	update_rq_clock(rq);
+
+	/* Serialize partial clamp validation with other updates to this task. */
+	if (attr->sched_flags & SCHED_FLAG_UTIL_CLAMP) {
+		retval = uclamp_validate(p, attr);
+		if (retval) {
+			task_rq_unlock(rq, p, &rf);
+			return retval;
+		}
+	}
 
 	/*
 	 * Changing the policy of the stop threads its a very bad idea:
