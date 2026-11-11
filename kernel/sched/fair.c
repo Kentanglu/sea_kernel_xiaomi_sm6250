@@ -245,7 +245,7 @@ static void update_burst_score(struct sched_entity *se)
 	se->burst_score = se->burst_penalty >> 2;
 
 	new_prio = min(39, prio + se->burst_score);
-	if (!idle_policy(p->policy) &&  (new_prio != prev_prio)
+	if (!idle_policy(p->policy) &&  new_prio != prev_prio)
 		reweight_task(p, new_prio);
 }
 
