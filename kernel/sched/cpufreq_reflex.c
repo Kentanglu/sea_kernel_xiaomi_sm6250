@@ -157,7 +157,7 @@ static bool rfx_should_update_freq(struct rfx_policy *rfx_pol, u64 time)
 {
 	s64 delta_ns;
 
-	if (!cpufreq_can_do_remote_dvfs(rfx_pol->policy))
+	if (!cpufreq_this_cpu_can_update(rfx_pol->policy))
 		return false;
 
 	if (unlikely(READ_ONCE(rfx_pol->limits_changed))) {
